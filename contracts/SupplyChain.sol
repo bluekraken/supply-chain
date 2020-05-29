@@ -39,6 +39,14 @@ contract SupplyChain {
         public
         returns (uint32)
     {
+        // Check participant type is 'Manufacturer', 'Supplier' or 'Consumer'
+        bytes32 participantType = keccak256(abi.encodePacked(_pType));
+        require(participantType == keccak256("Manufacturer") ||
+            participantType == keccak256("Supplier") ||
+            participantType == keccak256("Consumer"),
+            "Participant type must be 'Manufacturer', 'Supplier' or 'Consumer'"
+        );
+
         uint32 userId = u_id++;
         participants[userId].userName = _name;
         participants[userId].password = _pass;
@@ -83,7 +91,7 @@ contract SupplyChain {
         public
         returns (uint32)
     {
-        if(keccak256(abi.encodePacked(participants[_ownerId].participantType)) == keccak256("Manufacturer")) {
+        if (keccak256(abi.encodePacked(participants[_ownerId].participantType)) == keccak256("Manufacturer")) {
             uint32 productId = p_id++;
 
             products[productId].modelNumber = _modelNumber;
@@ -129,25 +137,22 @@ contract SupplyChain {
         participant memory p1 = participants[_user1Id];
         participant memory p2 = participants[_user2Id];
 
-        if(keccak256(abi.encodePacked(p1.participantType)) == keccak256("Manufacturer") &&
-            keccak256(abi.encodePacked(p2.participantType)) == keccak256("Supplier"))
-        {
+        bytes32 p1Type = keccak256(abi.encodePacked(p1.participantType));
+        bytes32 p2Type = keccak256(abi.encodePacked(p2.participantType));
+
+        if (p1Type == keccak256("Manufacturer") && p2Type == keccak256("Supplier")) {
             products[_prodId].productOwner = p2.participantAddress;
             addRegistration(_prodId, p2.participantAddress, _user2Id, uint32(now));
 
             return (true);
         }
-        else if(keccak256(abi.encodePacked(p1.participantType)) == keccak256("Supplier") &&
-            keccak256(abi.encodePacked(p2.participantType)) == keccak256("Supplier"))
-        {
+        else if (p1Type == keccak256("Supplier") && p2Type == keccak256("Supplier")) {
             products[_prodId].productOwner = p2.participantAddress;
             addRegistration(_prodId, p2.participantAddress, _user2Id, uint32(now));
 
             return (true);
         }
-        else if(keccak256(abi.encodePacked(p1.participantType)) == keccak256("Supplier") &&
-            keccak256(abi.encodePacked(p2.participantType))==keccak256("Consumer"))
-        {
+        else if (p1Type == keccak256("Supplier") && p2Type == keccak256("Consumer")) {
             products[_prodId].productOwner = p2.participantAddress;
             addRegistration(_prodId, p2.participantAddress, _user2Id, uint32(now));
 
