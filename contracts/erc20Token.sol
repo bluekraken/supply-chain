@@ -28,8 +28,8 @@ contract ERC20Token is ERC20Interface {
 
     // Transfer tokens from msg.sender to a specified address
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        require(_value >= 0,"Cannot transfer negative amount.");
-        require(balances[msg.sender] >= _value,"Insufficient funds for transfer source.");
+        require(_value >= 0, "Cannot transfer a negative amount.");
+        require(balances[msg.sender] >= _value, "Insufficient funds for transfer.");
         balances[msg.sender] -= _value;
         balances[_to] += _value;
         emit Transfer(msg.sender, _to, _value);
@@ -39,7 +39,7 @@ contract ERC20Token is ERC20Interface {
     // Transfer tokens from one specified address to another specified address
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         uint256 allowance = allowed[_from][msg.sender];
-        require(balances[_from] >= _value && allowance >= _value,"Insufficient allowed funds for transfer source.");
+        require(balances[_from] >= _value && allowance >= _value, "Insufficient allowed funds for transfer.");
         balances[_from] -= _value;
         balances[_to] += _value;
         if (allowance < MAX_UINT256) {
