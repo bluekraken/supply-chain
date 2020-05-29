@@ -2,9 +2,10 @@
 // ERC Token Standard #20 Interface
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 // ----------------------------------------------------------------------------
+
 pragma solidity ^0.5.16;
 
-contract erc20Interface {
+contract ERC20Interface {
     uint256 public totalSupply;
 
     // function totalSupply() public view returns (uint);

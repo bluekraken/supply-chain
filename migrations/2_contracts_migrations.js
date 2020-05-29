@@ -1,7 +1,7 @@
-var erc20Token = artifacts.require("./erc20Token.sol");
-var SupplyChain = artifacts.require("./SupplyChain.sol");
+const erc20Token = artifacts.require("./ERC20Token.sol");
+const supplyChain = artifacts.require("./SupplyChain.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(erc20Token, 10000, "MGS Token", 18, "MGS");
-  deployer.deploy(SupplyChain);
+  deployer.deploy(erc20Token, 10000, "TrustQuay Token", 18, "TQT");
+  deployer.deploy(supplyChain);
 };

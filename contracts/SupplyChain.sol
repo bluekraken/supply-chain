@@ -1,6 +1,6 @@
 pragma solidity ^0.5.16;
 
-contract supplyChain {
+contract SupplyChain {
     uint32 public p_id = 0;   // Product ID
     uint32 public u_id = 0;   // Participant ID
     uint32 public r_id = 0;   // Registration ID
@@ -49,7 +49,16 @@ contract supplyChain {
         return (participants[_p_id].userName, participants[_p_id].participantAddress, participants[_p_id].participantType);
     }
 
-    function createProduct(uint32 _ownerId, string memory _modelNumber, string memory _partNumber, string memory _serialNumber, uint32 _productCost) public returns (uint32) {
+    function createProduct(
+        uint32 _ownerId,
+        string memory _modelNumber,
+        string memory _partNumber,
+        string memory _serialNumber,
+        uint32 _productCost
+    )
+        public
+        returns (uint32)
+    {
         if(keccak256(abi.encodePacked(participants[_ownerId].participantType)) == keccak256("Manufacturer")) {
             uint32 productId = p_id++;
 
@@ -72,8 +81,19 @@ contract supplyChain {
 
     }
 
-    function getProductDetails(uint32 _productId) public view returns (string memory, string memory, string memory, uint32, address, uint32){
-        return (products[_productId].modelNumber, products[_productId].partNumber, products[_productId].serialNumber, products[_productId].cost, products[_productId].productOwner, products[_productId].mfgTimeStamp);
+    function getProductDetails(uint32 _productId)
+        public
+        view
+        returns (string memory, string memory, string memory, uint32, address, uint32)
+    {
+        return (
+            products[_productId].modelNumber,
+            products[_productId].partNumber,
+            products[_productId].serialNumber,
+            products[_productId].cost,
+            products[_productId].productOwner,
+            products[_productId].mfgTimeStamp
+        );
     }
 
     function transferToOwner(uint32 _user1Id, uint32 _user2Id, uint32 _prodId) public onlyOwner(_prodId) returns (bool) {
@@ -81,7 +101,9 @@ contract supplyChain {
         participant memory p2 = participants[_user2Id];
         uint32 registration_id = r_id++;
 
-        if(keccak256(abi.encodePacked(p1.participantType)) == keccak256("Manufacturer") && keccak256(abi.encodePacked(p2.participantType))==keccak256("Supplier")){
+        if(keccak256(abi.encodePacked(p1.participantType)) == keccak256("Manufacturer") &&
+            keccak256(abi.encodePacked(p2.participantType))==keccak256("Supplier"))
+        {
             registrations[registration_id].productId = _prodId;
             registrations[registration_id].productOwner = p2.participantAddress;
             registrations[registration_id].ownerId = _user2Id;

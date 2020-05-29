@@ -4,9 +4,9 @@
 
 pragma solidity ^0.5.16;
 
-import "./erc20Interface.sol";
+import "./ERC20Interface.sol";
 
-contract erc20Token is erc20Interface {
+contract ERC20Token is ERC20Interface {
 
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
