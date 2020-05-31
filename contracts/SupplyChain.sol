@@ -78,7 +78,6 @@ contract SupplyChain {
         emit Transfer(_productId);
 
         return (true);
-
     }
 
     function createProduct(
@@ -109,11 +108,6 @@ contract SupplyChain {
        return 0;
     }
 
-    modifier onlyOwner(uint32 _productId) {
-         require(msg.sender == products[_productId].productOwner, 'Only the product owner can do this');
-         _;
-    }
-
     function getProductDetails(uint32 _productId)
         public
         view
@@ -127,6 +121,11 @@ contract SupplyChain {
             products[_productId].productOwner,
             products[_productId].mfgTimeStamp
         );
+    }
+
+    modifier onlyOwner(uint32 _productId) {
+         require(msg.sender == products[_productId].productOwner, 'Only the product owner can do this');
+         _;
     }
 
     function transferToOwner(uint32 _user1Id, uint32 _user2Id, uint32 _prodId)
