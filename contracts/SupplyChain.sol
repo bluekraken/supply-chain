@@ -11,7 +11,7 @@ contract SupplyChain {
         string serialNumber;
         address productOwner;
         uint32 cost;
-        uint32 mfgTimeStamp;
+        uint32 createTimeStamp;
     }
 
     mapping(uint32 => product) public products;
@@ -27,13 +27,13 @@ contract SupplyChain {
     struct registration {
         uint32 productId;
         uint32 ownerId;
-        uint32 trxTimeStamp;
+        uint32 transferTimeStamp;
         address productOwner;
     }
     mapping(uint32 => registration) public registrations; // Registrations by Registration ID (r_id)
     mapping(uint32 => uint32[]) public productTrack;  // Registrations by Product ID (p_id) / Movement track for a product
 
-    event Transfer(uint32 productId);
+    event Transfer(uint32 indexed productId);
 
     function createParticipant(string memory _name, string memory _pass, address _pAdd, string memory _pType)
         public
@@ -73,7 +73,7 @@ contract SupplyChain {
         registrations[registrationId].productId = _productId;
         registrations[registrationId].productOwner = _productOwner;
         registrations[registrationId].ownerId = _ownerId;
-        registrations[registrationId].trxTimeStamp = _timeStamp;
+        registrations[registrationId].transferTimeStamp = _timeStamp;
         productTrack[_productId].push(registrationId);
         emit Transfer(_productId);
 
@@ -85,27 +85,27 @@ contract SupplyChain {
         string memory _modelNumber,
         string memory _partNumber,
         string memory _serialNumber,
-        uint32 _productCost
+        uint32 _productCost,
+        uint32 _timestamp
     )
         public
         returns (uint32)
     {
-        if (keccak256(abi.encodePacked(participants[_ownerId].participantType)) == keccak256("Manufacturer")) {
-            uint32 productId = p_id++;
+        require(keccak256(abi.encodePacked(participants[_ownerId].participantType)) == keccak256("Manufacturer"),
+            "Only a 'Manufacturer' can create a product"
+        );
+        uint32 productId = p_id++;
 
-            products[productId].modelNumber = _modelNumber;
-            products[productId].partNumber = _partNumber;
-            products[productId].serialNumber = _serialNumber;
-            products[productId].cost = _productCost;
-            products[productId].productOwner = participants[_ownerId].participantAddress;
-            products[productId].mfgTimeStamp = uint32(now);
+        products[productId].modelNumber = _modelNumber;
+        products[productId].partNumber = _partNumber;
+        products[productId].serialNumber = _serialNumber;
+        products[productId].cost = _productCost;
+        products[productId].productOwner = participants[_ownerId].participantAddress;
+        products[productId].createTimeStamp = _timestamp;
 
-            addRegistration(productId, products[productId].productOwner, _ownerId, products[productId].mfgTimeStamp);
+        addRegistration(productId, products[productId].productOwner, _ownerId, _timestamp);
 
-            return productId;
-        }
-
-       return 0;
+        return productId;
     }
 
     function getProductDetails(uint32 _productId)
@@ -119,7 +119,7 @@ contract SupplyChain {
             products[_productId].serialNumber,
             products[_productId].cost,
             products[_productId].productOwner,
-            products[_productId].mfgTimeStamp
+            products[_productId].createTimeStamp
         );
     }
 
@@ -128,7 +128,7 @@ contract SupplyChain {
          _;
     }
 
-    function transferToOwner(uint32 _user1Id, uint32 _user2Id, uint32 _prodId)
+    function transferToOwner(uint32 _user1Id, uint32 _user2Id, uint32 _prodId, uint32 _timestamp)
         public
         onlyOwner(_prodId)
         returns (bool)
@@ -141,19 +141,19 @@ contract SupplyChain {
 
         if (p1Type == keccak256("Manufacturer") && p2Type == keccak256("Supplier")) {
             products[_prodId].productOwner = p2.participantAddress;
-            addRegistration(_prodId, p2.participantAddress, _user2Id, uint32(now));
+            addRegistration(_prodId, p2.participantAddress, _user2Id, _timestamp);
 
             return (true);
         }
         else if (p1Type == keccak256("Supplier") && p2Type == keccak256("Supplier")) {
             products[_prodId].productOwner = p2.participantAddress;
-            addRegistration(_prodId, p2.participantAddress, _user2Id, uint32(now));
+            addRegistration(_prodId, p2.participantAddress, _user2Id, _timestamp);
 
             return (true);
         }
         else if (p1Type == keccak256("Supplier") && p2Type == keccak256("Consumer")) {
             products[_prodId].productOwner = p2.participantAddress;
-            addRegistration(_prodId, p2.participantAddress, _user2Id, uint32(now));
+            addRegistration(_prodId, p2.participantAddress, _user2Id, _timestamp);
 
             return (true);
         }
@@ -169,7 +169,7 @@ contract SupplyChain {
     function getRegistrationDetails(uint32 _regId) public view returns (uint32, uint32, address, uint32) {
         registration memory r = registrations[_regId];
 
-        return (r.productId, r.ownerId, r.productOwner, r.trxTimeStamp);
+        return (r.productId, r.ownerId, r.productOwner, r.transferTimeStamp);
     }
 
     function authenticateParticipant(uint32 _uid, string memory _uname, string memory _pass, string memory _utype) public view returns (bool) {

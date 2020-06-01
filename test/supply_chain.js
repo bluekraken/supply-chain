@@ -10,46 +10,63 @@ contract("SupplyChain", async (accounts) => {
     assert(testInstance !== undefined, 'Supply Chain contract should be defined');
   });
 
-  it("Should create a particpant", async () => {
+  it("Should create a Manufacturer", async () => {
     try {
-      let participantId = await testInstance.createParticipant("Jalfrezi", "SmallBrownJobbie",
+      const participantId = await testInstance.createParticipant("Jalfrezi", "JaguarWalkerViolin",
         accounts[1], "Manufacturer");
-      assert.ok(true, "Participant created.")
+      assert.ok(true, "A Manufacturer was created.");
     } catch (error) {
-      assert.ok(false, "Oops, something went wrong!")
+      assert.ok(false, "Oops, something went wrong!");
     }
-  })
+  });
 
-  it("Should not create a particpant", async () => {
+  it("Should create a Supplier", async () => {
     try {
-      let participantId = await testInstance.createParticipant("Barnaby Plankton", "HeavyPencilGardener",
-        accounts[4], "Consimer");
-      assert.ok(false, "Oops, something went wrong!")
+      const participantId = await testInstance.createParticipant("Mother Shipton", "LadderForestGarter",
+        accounts[2], "Supplier");
+      assert.ok(true, "A Supplier was created.");
     } catch (error) {
-      assert.ok(true, "Participant not created.")
+      assert.ok(false, "Oops, something went wrong!");
     }
-  })
+  });
 
-  // it("Should create a participant", async () => {
-  //   let participantId = await testInstance.createParticipant("Jalfrezi", "SmallBrownJobbie",
-  //     accounts[1], "Manufacturer");
-  //   let participant = await testInstance.getParticipantDetails(0);
-  //   assert.equal(participant[0], "Jalfrezi");
-  //   assert.equal(participant[1], accounts[1]);
-  //   assert.equal(participant[2], "Manufacturer");
+  it("Should create a Consumer", async () => {
+    try {
+      const participantId = await testInstance.createParticipant("Agnes Nutter", "CarpetJellyStick",
+        accounts[3], "Consumer");
+      assert.ok(true, "A Consumer was created.");
+    } catch (error) {
+      assert.ok(false, "Oops, something went wrong!");
+    }
+  });
 
-  //   participantId = await testInstance.createParticipant("Mother Shipton", "LargeForestDweller",
-  //     accounts[2], "Supplier");
-  //   participant = await testInstance.getParticipantDetails(1);
-  //   assert.equal(participant[0], "Mother Shipton");
-  //   assert.equal(participant[1], accounts[2]);
-  //   assert.equal(participant[2], "Supplier");
+  it("Should not create a Consimer", async () => {
+    try {
+      const participantId = await testInstance.createParticipant("Barnaby Plankton", "GapingPencilCheese",
+        accounts[4], "Consumer");
+      assert.ok(false, "Oops, something went wrong!");
+    } catch (error) {
+      assert.ok(true, "A Consimer was not created.");
+    }
+  });
 
-  //   participantId = await testInstance.createParticipant("Agnes Nutter", "CarpetJellyStick",
-  //     accounts[3], "Consumer");
-  //   participant = await testInstance.getParticipantDetails(2);
-  //   assert.equal(participant[0], "Agnes Nutter");
-  //   assert.equal(participant[1], accounts[3]);
-  //   assert.equal(participant[2], "Consumer");
-  // })
+  it("Should get participant details", async () => {
+    try {
+      const participant = await testInstance.getParticipantDetails(0);
+      assert.equal(participant[0], "Jalfrezi");
+      assert.equal(participant[1], accounts[1]);
+      assert.equal(participant[2], "Manufacturer");
+    } catch (error) {
+      assert.ok(false, "Oops, something went wrong!");
+    }
+  });
+
+  it("Should not get participant details", async () => {
+    try {
+      const participant = await testInstance.getParticipantDetails(3);
+      assert.ok(false, "Oops, something went wrong!");
+    } catch (error) {
+      assert.ok(true, "Could not get the participant details");
+    }
+  });
 })
